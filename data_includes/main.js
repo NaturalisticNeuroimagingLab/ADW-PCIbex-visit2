@@ -39,7 +39,7 @@ PennController.ResetPrefix(null)
 // see: https://doc.pcibex.net/how-to-guides/collecting-eyetracking-data/#php-script
 EyeTrackerURL("https://dummy.url/script.php")
 // notes: addhosts for urls, add servers for videos
-
+AddHost("https://headspacestudios.s3.amazonaws.com/ocd_movies/")
 
 // ---------------- introduction and baseline distress rating 
 newTrial("instructions-movieFull",
@@ -71,6 +71,10 @@ CheckPreloaded()
 // template 
 Template("movieURL-full.csv", row =>
 	newTrial("movieFull-"+row.id,
+		newText("instructions-calibration", "Eye tracking calibaration will begin. Make sure to look at the green dots as they appear!")
+			.center()
+			.print()
+		,
         newButton("introMovieFull", "Click to begin "+row.id) 
             .center()
             .print() 
@@ -259,32 +263,61 @@ Template("movieURL-clips.csv", row =>
 		)  
 )
 
-newTrial("movieCalm",
-	// Button Scaling
-    newButton("introMovieCalm", "Click to begin") 
+// ----------------- calming movie selection and play
+
+newVar("movieCalm-choice", "") // define choice variable to pass between trials 
+	.global()
+
+  
+newTrial("movieCalm-selection",
+
+	// select movie
+	newScale("movieCalm-options", "Bao","Hugo","Inscapes","Inside Out","Moonrise","Penguins of Madagascar","Piper", "No Movie") // these strings must match the dict keys exactyly in movieURL-calm-dict.js
+		.radio()
+		.center()
+		.vertical()
+		.labelsPosition("right") 
+		.log("last")
+		.print()
+	,
+	// Button Selection
+    newButton("introMovieCalm", "Choose your movie then click to begin!") 
         .center()
         .print() 
-        .wait() 
-    ,
+        .wait( getScale("movieCalm-options").test.selected() ) 
+    ,	
+	getVar("movieCalm-choice").set( getScale("movieCalm-options")  ) // save selection
+	,
+	getVar("movieCalm-choice").set( v=>movieURL_calm_dict[v]) // compare to preloaded dict with URLs
+	,
+	getVar("movieCalm-choice").set( function(v){ movieChoice = v; return v;}) // set preloaded variable movieChoice to URL
+)
+ 
+//play movie from embedded movieCalm.html
+newTrial("movieCalm",
+
     clear() 
     ,
 	// load video url
-	newVideo("calmMovie", "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1920_18MG.mp4")		.size("80vw", "80vh") 
-		//.disable(0.01) 
+	newHtml("movieHTML", "movieCalm.html").size("80vw", "80vh")   // load html file
 		.log() 
 	,
+    newButton("exitMovie", "Click to exit") // generate exit html file
+        .center()
+    ,
 	// set up canvas 
 	newCanvas("movieCanvas", "90vw", "90vh")
 		.color("orange")
-		.add("center at 50%", "middle at 50%", getVideo("calmMovie"))
-		.print("center at 50%", "middle at 50%")
+		.add("center at 50%", "middle at 50%", getHtml("movieHTML"))
+		.add("center at 50%", "middle at 90%", getButton("exitMovie"))
+		.print("center at 50%", "middle at 50%") 
 	,
-	// ---------start video 
-	getVideo("calmMovie")
-		.play()
-		.wait()
-	    .stop()
-	,
+	newFunction("selectMovie", function(){document.getElementById("movieFrame").src = movieChoice;}) //change html iframe to selected source
+	    .call()
+	, 
+    getButton("exitMovie") // wait for subject to exit the movie 
+        .wait()
+    ,
 	clear()
 	,	
 	// input distress rating 
@@ -302,5 +335,5 @@ newTrial("movieCalm",
 )
 
  
-SendResults() 
+SendResults()  
 
