@@ -27,7 +27,10 @@ Movie 1 / Movie 2:
 Movie Clips
 	- practice round with slider bar  
 	- watch 1 minute clips of ocd movie w continuous rating 
- 
+
+Calming Movie 
+    - select from a list of calming movies presented in the demo
+    - or user can skip
 
 */
 
@@ -69,7 +72,7 @@ CheckPreloaded()
 
 // ---------------- Movie 1 / Movie 2 Trial 
 // template 
-Template("movieURL-full.csv", row =>
+Template("visit2-movieURL-full.csv", row =>
 	newTrial("movieFull-"+row.id,
 		newText("instructions-calibration", "Eye tracking calibaration will begin. Make sure to look at the green dots as they appear!")
 			.center()
@@ -202,7 +205,7 @@ newTrial("instructions-movieClips",
  
   
 // template  
-Template("movieURL-clips.csv", row =>
+Template("visit2-movieURL-clips.csv", row =>
 	newTrial("movieClips-"+row.id,
 	
 		// arrow listening functions
@@ -224,6 +227,10 @@ Template("movieURL-clips.csv", row =>
 		, 
 
 		// ---------initialize content 
+		newText("instructions-1", "Remember to use the up and down arrow keys to change the slider!")
+	        .center()
+	        .print()
+	    ,
 		newButton("Click to begin the next movie")
 		    .center()
 		    .print()
@@ -267,8 +274,8 @@ Template("movieURL-clips.csv", row =>
 
 newVar("movieCalm-choice", "") // define choice variable to pass between trials 
 	.global()
-
-  
+ 
+ 
 newTrial("movieCalm-selection",
 
 	// select movie
