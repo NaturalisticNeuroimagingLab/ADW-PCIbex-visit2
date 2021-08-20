@@ -78,7 +78,7 @@ Template("visit2-movieURL-full.csv", row =>
 			.center()
 			.print()
 		,
-        newButton("introMovieFull", "Click to begin "+row.id) 
+        newButton("introMovieFull", "Click to begin the movie") 
             .center()
             .print() 
             .wait() 
